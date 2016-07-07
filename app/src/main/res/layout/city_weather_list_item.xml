@@ -33,7 +33,7 @@
 
     <android.support.v7.widget.AppCompatTextView
         android:id="@+id/city_weather_data_list_item_text_view_max"
-        android:layout_width="80dp"
+        android:layout_width="130dp"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
@@ -45,7 +45,7 @@
 
     <android.support.v7.widget.AppCompatTextView
         android:id="@+id/city_weather_data_list_item_text_view_min"
-        android:layout_width="80dp"
+        android:layout_width="130dp"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/city_weather_data_list_item_text_view_max"
         android:layout_alignStart="@+id/city_weather_data_list_item_text_view_max"

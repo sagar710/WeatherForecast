@@ -19,46 +19,58 @@ import com.sagar.sunshineweather.interfaces.IConstants;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ *
+ * The below activity is used to save the settings.
+ */
+
 public class SettingsActivity extends AppCompatActivity implements IConstants {
     private AppCompatSpinner mSpinnerUnits;
 
     private List<String> mListUnits;
 
-    private String unitSaved;
+    private String mUnitSaved;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_settings);
+        try {
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.activity_settings);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+            Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+            setSupportActionBar(toolbar);
 
-        mSpinnerUnits = (AppCompatSpinner) findViewById(R.id.settings_activity_spinner_choose_units);
-        mListUnits = Arrays.asList(getResources().getStringArray(R.array.pref_units_options));
+            mSpinnerUnits = (AppCompatSpinner) findViewById(R.id.settings_activity_spinner_choose_units);
+            mListUnits = Arrays.asList(getResources().getStringArray(R.array.pref_units_options));
 
-        fnShowUnitsDropDown();
+            fnShowUnitsDropDown();
+        } catch ( Exception e ) {
+            Log.d( LOG_TAG, "Exception SettingsActivity onCreate: " +Log.getStackTraceString( e ));
+        }
     }
 
     /* The below method is used to show the units in the dropdown.. */
 
     private void fnShowUnitsDropDown() {
-        ArrayAdapter <String> adapter = new ArrayAdapter<>( this, R.layout.spinner_items, mListUnits );
-        adapter.setDropDownViewResource( android.R.layout.simple_spinner_dropdown_item );
-        mSpinnerUnits.setAdapter( adapter );
+        try {
+            ArrayAdapter <String> adapter = new ArrayAdapter<>( this, R.layout.spinner_items, mListUnits );
+            adapter.setDropDownViewResource( android.R.layout.simple_spinner_dropdown_item );
+            mSpinnerUnits.setAdapter( adapter );
 
-        mSpinnerUnits.setOnItemSelectedListener( new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected( AdapterView<?> parent, View view,
-                                        int position, long id ) {
-                unitSaved = mListUnits.get( position );
-                Log.d(LOG_TAG, "Unit selected: " +mListUnits.get( position ) );
-            }
+            mSpinnerUnits.setOnItemSelectedListener( new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected( AdapterView<?> parent, View view,
+                                            int position, long id ) {
+                    mUnitSaved = mListUnits.get( position );
+                }
 
-            @Override
-            public void onNothingSelected( AdapterView<?> parent ) {
-            }
-        });
+                @Override
+                public void onNothingSelected( AdapterView<?> parent ) {
+                }
+            });
+        } catch ( Exception e ) {
+            Log.d( LOG_TAG, "Exception SettingsActivity fnShowUnitsDropdown: " +Log.getStackTraceString( e ));
+        }
     }
 
     @Override
@@ -79,14 +91,14 @@ public class SettingsActivity extends AppCompatActivity implements IConstants {
             } else if ( id == R.id.menu_settings_save ) {
                 SharedPreferences sharedPreferences = getSharedPreferences( SHARED_PREFERENCES_WEATHER, MODE_PRIVATE );
                 SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putString( UNIT_STORED, unitSaved );
+                editor.putString( UNIT_STORED, mUnitSaved );
                 editor.apply();
 
                 Toast.makeText( this, "Preferences saved", Toast.LENGTH_SHORT ).show();
                 onBackPressed();
             }
         } catch ( Exception e ) {
-            Log.d( LOG_TAG, "Exception AddCities onOptionsItemSelected: " +Log.getStackTraceString( e ));
+            Log.d( LOG_TAG, "Exception SettingsActivity onOptionsItemSelected: " +Log.getStackTraceString( e ));
         }
         return super.onOptionsItemSelected(item);
     }

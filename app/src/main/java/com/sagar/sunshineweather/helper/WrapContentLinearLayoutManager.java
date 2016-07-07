@@ -8,12 +8,10 @@ import android.util.Log;
 import com.sagar.sunshineweather.interfaces.IConstants;
 
 public class WrapContentLinearLayoutManager extends LinearLayoutManager implements IConstants {
-
     public WrapContentLinearLayoutManager(Context context, int orientation, boolean reverseLayout) {
         super(context, orientation, reverseLayout);
     }
 
-    //... constructor
     @Override
     public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
         try {

@@ -3,7 +3,6 @@ package com.sagar.sunshineweather.adapters;
 import android.content.Context;
 import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,23 +29,15 @@ public class CityRecyclerAdapter extends RecyclerView.Adapter <CityRecyclerAdapt
 
     @Override
     public void onBindViewHolder( CityViewHolder holder, int position) {
-        Log.d( LOG_TAG, "City name to add: " +mListCities.get( position ) +" for position: " +position );
         holder.mTxtViewCity.setText( mListCities.get( position ));
     }
 
     @Override
     public int getItemCount() {
-        Log.d( LOG_TAG, "Size of city list: " +mListCities.size() );
         return mListCities.size();
     }
 
-    public void removeItem( int position ) {
-        mListCities.remove( position );
-        notifyItemRemoved( position );
-    }
-
     class CityViewHolder extends RecyclerView.ViewHolder {
-        // each data item is just a string in this case
         AppCompatTextView mTxtViewCity;
 
         public CityViewHolder(View v) {

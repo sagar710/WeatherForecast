@@ -15,12 +15,17 @@ import com.sagar.sunshineweather.data.WeatherDetails;
 import com.sagar.sunshineweather.interfaces.IConstants;
 import com.squareup.picasso.Picasso;
 
+/**
+ *
+ * The below activity shows the detailed weather information.
+ */
+
 public class WeatherDetailActivity extends AppCompatActivity implements IConstants {
     private AppCompatTextView mTextViewDate, mTextViewMax, mTextViewMin, mTextViewType, mTextViewPressure,
             mTextViewHumidity, mTextViewWind, mTextViewCityName;
     private AppCompatImageView mImageViewType;
 
-    private String mWeatherDate, mMax, mMin, mType, mImageType, mCityName, mActivityName;
+    private String mCityName, mActivityName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,14 +55,21 @@ public class WeatherDetailActivity extends AppCompatActivity implements IConstan
             mActivityName = intent.getExtras().getString( "ACTIVITY_NAME" );
             WeatherDetails weatherDetailsObj = (WeatherDetails) intent.getSerializableExtra("WEATHER_DETAIL_OBJECT");
 
+            String text;
+
             mTextViewDate.setText(weatherDetailsObj.getDate());
             mTextViewCityName.setText( mCityName );
             mTextViewType.setText(weatherDetailsObj.getWeatherType());
-            mTextViewMax.setText(weatherDetailsObj.getMaxTemp() + "\u00b0");
-            mTextViewMin.setText(weatherDetailsObj.getMinTemp() + "\u00b0");
-            mTextViewPressure.setText( "Pressure: " +weatherDetailsObj.getPressure() +" hPa" );
-            mTextViewHumidity.setText( "Humidity: " +weatherDetailsObj.getHumidity() + " %");
-            mTextViewWind.setText( "Wind: " +weatherDetailsObj.getWind() + " meter/sec");
+            text = weatherDetailsObj.getMaxTemp() + "\u00b0";
+            mTextViewMax.setText( text );
+            text = weatherDetailsObj.getMinTemp() + "\u00b0";
+            mTextViewMin.setText( text );
+            text = "Pressure: " +weatherDetailsObj.getPressure() +" hPa";
+            mTextViewPressure.setText( text );
+            text = "Humidity: " +weatherDetailsObj.getHumidity() + " %";
+            mTextViewHumidity.setText( text );
+            text = "Wind: " +weatherDetailsObj.getWind() + " meter/sec";
+            mTextViewWind.setText( text );
             Picasso.with(this)
                     .load(BASE_IMAGE_URL + weatherDetailsObj.getIcon())
                     .into(mImageViewType);
@@ -102,8 +114,6 @@ public class WeatherDetailActivity extends AppCompatActivity implements IConstan
             } else {
                 Intent intent = new Intent(this, CityWeatherActivity.class);
                 intent.putExtra( "CITY_NAME", mCityName );
-//                intent.putExtra( "ACTIVITY_NAME", mActivityName );
-//                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity( intent );
                 finish();
             }

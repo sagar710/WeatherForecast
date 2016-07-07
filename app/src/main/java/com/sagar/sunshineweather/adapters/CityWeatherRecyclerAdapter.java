@@ -1,10 +1,10 @@
 package com.sagar.sunshineweather.adapters;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,15 +35,28 @@ public class CityWeatherRecyclerAdapter extends RecyclerView.Adapter <CityWeathe
     @Override
     public void onBindViewHolder(CityWeatherViewHolder holder, int position) {
         WeatherDetails weatherDetailsObj = mListWeatherData.get( position );
+        SharedPreferences sharedPreferences = mContext.getSharedPreferences( SHARED_PREFERENCES_WEATHER,
+                Context.MODE_PRIVATE );
+        String unitSaved = sharedPreferences.getString( UNIT_STORED, "Metric" );
 
-        Log.d( LOG_TAG, "Position: " +position+ ", Type: " +BASE_IMAGE_URL+ weatherDetailsObj.getIcon() );
         Picasso.with( mContext )
                 .load( BASE_IMAGE_URL+ weatherDetailsObj.getIcon() )
                 .into( holder.mImgViewType );
         holder.mTxtViewWeatherDate.setText( weatherDetailsObj.getDate() );
         holder.mTxtViewWeatherType.setText( weatherDetailsObj.getWeatherType() );
-        holder.mTxtViewMax.setText( weatherDetailsObj.getMaxTemp() +"\u00b0" );
-        holder.mTxtViewMin.setText( weatherDetailsObj.getMinTemp() +"\u00b0" );
+
+        String tempToShow;
+        if( unitSaved.equals( "Metric" )) {
+            tempToShow = "Max   " +weatherDetailsObj.getMaxTemp() +"\u00b0";
+            holder.mTxtViewMax.setText( tempToShow );
+            tempToShow = "Min   " +weatherDetailsObj.getMinTemp() +"\u00b0";
+            holder.mTxtViewMin.setText( tempToShow );
+        } else {
+            tempToShow = "Max   " +weatherDetailsObj.getMaxTemp() +"  F";
+            holder.mTxtViewMax.setText( tempToShow );
+            tempToShow = "Min   " +weatherDetailsObj.getMinTemp() +"  F";
+            holder.mTxtViewMin.setText( tempToShow );
+        }
     }
 
     @Override
@@ -52,7 +65,6 @@ public class CityWeatherRecyclerAdapter extends RecyclerView.Adapter <CityWeathe
     }
 
     class CityWeatherViewHolder extends RecyclerView.ViewHolder {
-        // each data item is just a string in this case
         AppCompatTextView mTxtViewWeatherDate, mTxtViewWeatherType, mTxtViewMax, mTxtViewMin;
         AppCompatImageView mImgViewType;
 

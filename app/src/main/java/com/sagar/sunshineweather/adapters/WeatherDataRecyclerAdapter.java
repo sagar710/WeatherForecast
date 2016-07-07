@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,7 +36,6 @@ public class WeatherDataRecyclerAdapter extends RecyclerView.Adapter <WeatherDat
     public void onBindViewHolder(WeatherDataRecyclerAdapter.WeatherDataViewHolder holder, int position) {
         WeatherDetails weatherDetailsObj = mListWeatherData.get( position );
 
-        Log.d( LOG_TAG, "Position: " +position+ ", Type: " +BASE_IMAGE_URL+ weatherDetailsObj.getIcon() );
         Picasso.with( mContext )
                 .load( BASE_IMAGE_URL+ weatherDetailsObj.getIcon() )
                 .into( holder.mImgViewType );
@@ -48,12 +46,17 @@ public class WeatherDataRecyclerAdapter extends RecyclerView.Adapter <WeatherDat
                 Context.MODE_PRIVATE );
         String unitSaved = sharedPreferences.getString( UNIT_STORED, "Metric" );
 
+        String tempToShow;
         if( unitSaved.equals( "Metric" )) {
-            holder.mTxtViewMax.setText( "Max    " +weatherDetailsObj.getMaxTemp() +"\u00b0" );
-            holder.mTxtViewMin.setText( "Min     " +weatherDetailsObj.getMinTemp() +"\u00b0" );
+            tempToShow = "Max   " +weatherDetailsObj.getMaxTemp() +"\u00b0";
+            holder.mTxtViewMax.setText( tempToShow );
+            tempToShow = "Min     " +weatherDetailsObj.getMinTemp() +"\u00b0";
+            holder.mTxtViewMin.setText( tempToShow );
         } else {
-            holder.mTxtViewMax.setText( "Max    " +weatherDetailsObj.getMaxTemp() +" F" );
-            holder.mTxtViewMin.setText( "Min     " +weatherDetailsObj.getMinTemp() +" F" );
+            tempToShow = "Max   " +weatherDetailsObj.getMaxTemp() +"  F";
+            holder.mTxtViewMax.setText( tempToShow );
+            tempToShow = "Min   " +weatherDetailsObj.getMinTemp() +"  F";
+            holder.mTxtViewMin.setText( tempToShow );
         }
     }
 
@@ -63,7 +66,6 @@ public class WeatherDataRecyclerAdapter extends RecyclerView.Adapter <WeatherDat
     }
 
     class WeatherDataViewHolder extends RecyclerView.ViewHolder {
-        // each data item is just a string in this case
         AppCompatTextView mTxtViewWeatherDate, mTxtViewWeatherType, mTxtViewMax, mTxtViewMin;
         AppCompatImageView mImgViewType;
 

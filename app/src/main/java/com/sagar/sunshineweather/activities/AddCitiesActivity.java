@@ -24,10 +24,14 @@ import com.sagar.sunshineweather.interfaces.IConstants;
 
 import java.util.ArrayList;
 
+/**
+ *
+ * The below activity accepts the cities from the user and shows it in list form.
+ */
+
 public class AddCitiesActivity extends AppCompatActivity implements IConstants {
     private AppCompatEditText mEditTextAddCity;
     private RecyclerView mRecyclerView;
-    private RecyclerView.LayoutManager layoutManager;
     private CityRecyclerAdapter mAdapter;
     private AppCompatButton mBtnAddCity;
 
@@ -64,7 +68,7 @@ public class AddCitiesActivity extends AppCompatActivity implements IConstants {
             mAdapter = new CityRecyclerAdapter(mListCities, this);
 
             mRecyclerView.setHasFixedSize(true);
-            layoutManager = new LinearLayoutManager(this);
+            RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
             mRecyclerView.setLayoutManager(new WrapContentLinearLayoutManager(getApplicationContext(),
                     LinearLayoutManager.VERTICAL, false));
             mRecyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -114,9 +118,7 @@ public class AddCitiesActivity extends AppCompatActivity implements IConstants {
         try {
             super.onResume();
 
-            Log.d(LOG_TAG, "OnResume");
             mAdapter.notifyDataSetChanged();
-//            mAdapter.notifyItemInserted( mListCities.size() - 1 );
         } catch (Exception e) {
             Log.d(LOG_TAG, "Exception AddCitiesActivity onResume: " + Log.getStackTraceString(e));
         }
@@ -128,9 +130,7 @@ public class AddCitiesActivity extends AppCompatActivity implements IConstants {
                 fnShowAlertMessage(mCityName + " already exists.");
             } else {
                 mListCities.add(mCityName);
-                Log.d(LOG_TAG, "Item inserted at: " + (mListCities.size() - 1));
                 mAdapter.notifyDataSetChanged();
-//                mAdapter.notifyItemInserted( mListCities.size() - 1 );
             }
         } catch (Exception e) {
             Log.d(LOG_TAG, "Exception AddCitiesActivity fnShowData: " + Log.getStackTraceString(e));
@@ -138,11 +138,14 @@ public class AddCitiesActivity extends AppCompatActivity implements IConstants {
     }
 
     private boolean fnCheckCityExists() {
-        for (String city : mListCities) {
-            Log.d(LOG_TAG, "City name:" + city + ", City to check: " + mCityName);
-            if (city.equals(mCityName)) {
-                return true;
+        try {
+            for (String city : mListCities) {
+                if (city.equals(mCityName)) {
+                    return true;
+                }
             }
+        } catch ( Exception e ) {
+            Log.d( LOG_TAG, "Exception AddCities: " +Log.getStackTraceString( e ));
         }
         return false;
     }
@@ -198,8 +201,6 @@ public class AddCitiesActivity extends AppCompatActivity implements IConstants {
                     fnShowAlertMessage("City name cannot be empty.");
                 } else {
                     cityName = mCityName.split(" ");
-                    Log.d(LOG_TAG, "City name modified: " + cityName[0]);
-
                     mCityName = cityName[0];
                     fnShowData();
                 }
@@ -211,11 +212,15 @@ public class AddCitiesActivity extends AppCompatActivity implements IConstants {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+        try {
+            super.onBackPressed();
 
-        Intent intent = new Intent( this, MainActivity.class );
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity( intent );
-        finish();
+            Intent intent = new Intent( this, MainActivity.class );
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity( intent );
+            finish();
+        } catch ( Exception e ) {
+            Log.d(LOG_TAG, "Exception AddCitiesActivity onBackPressed: " + Log.getStackTraceString(e));
+        }
     }
 }

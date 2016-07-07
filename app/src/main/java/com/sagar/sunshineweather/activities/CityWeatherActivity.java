@@ -40,6 +40,12 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+
+/**
+ *
+ * The below activity shows weather summary for city entered by the user.
+ */
 
 public class CityWeatherActivity extends AppCompatActivity implements IConstants {
     private RecyclerView mRecyclerView;
@@ -47,8 +53,10 @@ public class CityWeatherActivity extends AppCompatActivity implements IConstants
     private AppCompatImageView mImageView;
 
     private ArrayList <WeatherDetails> mListWeatherData;
+    private Calendar mCalendar;
 
     private String mCityName, mUnitSaved, mPlaceName;
+    private int mHourOfDay;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +76,7 @@ public class CityWeatherActivity extends AppCompatActivity implements IConstants
             mCityName = getIntent().getExtras().getString( "CITY_NAME" );
 
             mListWeatherData = new ArrayList<>();
+            mCalendar = Calendar.getInstance();
             mRecyclerView = (RecyclerView) findViewById( R.id.city_weather_activity_recycler_view );
             mTextViewDate = (AppCompatTextView) findViewById( R.id.city_weather_activity_text_view_date );
             mTextViewMax = (AppCompatTextView) findViewById( R.id.city_weather_activity_text_view_max );
@@ -85,6 +94,7 @@ public class CityWeatherActivity extends AppCompatActivity implements IConstants
         try {
             super.onResume();
 
+            mHourOfDay = mCalendar.get( Calendar.HOUR_OF_DAY );
             if( fnIsConnected() ) {
                 new GetWeatherDetailsAsyncTask().execute();
             } else {
@@ -149,7 +159,7 @@ public class CityWeatherActivity extends AppCompatActivity implements IConstants
                 }
 
                 URL url = new URL( weatherURL );
-                Log.d( LOG_TAG, "URL: " +weatherURL );
+
                 // Create the request to OpenWeatherMap, and open the connection
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
@@ -179,7 +189,7 @@ public class CityWeatherActivity extends AppCompatActivity implements IConstants
                 forecastJsonStr = buffer.toString();
                 return forecastJsonStr;
             } catch ( Exception e) {
-                Log.e( LOG_TAG, "Error: " +Log.getStackTraceString( e ));
+                Log.d( LOG_TAG, "Error: " +Log.getStackTraceString( e ));
                 // If the code didn't successfully get the weather data, there's no point in attemping
                 // to parse it.
                 return null;
@@ -191,7 +201,7 @@ public class CityWeatherActivity extends AppCompatActivity implements IConstants
                     try {
                         reader.close();
                     } catch (final IOException e) {
-                        Log.e( LOG_TAG, "Error closing stream: " +Log.getStackTraceString( e ));
+                        Log.d( LOG_TAG, "Error closing stream: " +Log.getStackTraceString( e ));
                     }
                 }
             }
@@ -201,7 +211,6 @@ public class CityWeatherActivity extends AppCompatActivity implements IConstants
         protected void onPostExecute( String response ) {
             super.onPostExecute( response );
 
-            Log.d( LOG_TAG, "SunshineWeather: " +response );
             fnShowWeatherData( response );
         }
     }
@@ -267,31 +276,18 @@ public class CityWeatherActivity extends AppCompatActivity implements IConstants
 
             JSONObject jsonObjectCity = forecastJson.getJSONObject( OWM_CITY );
             mPlaceName = jsonObjectCity.getString( "name" );
-            Log.d( LOG_TAG, "City name: " +mPlaceName );
             mTextViewCityName.setText( mPlaceName );
-
-            // OWM returns daily forecasts based upon the local time of the city that is being
-            // asked for, which means that we need to know the GMT offset to translate this data
-            // properly.
-
-            // Since this data is also sent in-order and the first day is always the
-            // current day, we're going to take advantage of that to get a nice
-            // normalized UTC date for all of our weather.
 
             Time dayTime = new Time();
             dayTime.setToNow();
 
             // we start at the day returned by local time. Otherwise this is a mess.
             int julianStartDay = Time.getJulianDay(System.currentTimeMillis(), dayTime.gmtoff);
-
-            // now we work exclusively in UTC
             dayTime = new Time();
 
             for(int i = 0; i < weatherArray.length(); i++) {
-                // For now, using the format "Day, description, hi/low"
                 String day;
                 String description;
-                String highAndLow;
 
                 // Get the JSON object representing the day
                 JSONObject dayForecast = weatherArray.getJSONObject(i);
@@ -300,32 +296,56 @@ public class CityWeatherActivity extends AppCompatActivity implements IConstants
                 // into something human-readable, since most people won't read "1400356800" as
                 // "this saturday".
                 long dateTime;
-                // Cheating to convert this to UTC time, which is what we want anyhow
                 dateTime = dayTime.setJulianDay(julianStartDay+i);
                 day = getReadableDateString(dateTime);
 
-                // description is in a child array called "weather", which is 1 element long.
                 JSONObject weatherObject = dayForecast.getJSONArray(OWM_WEATHER).getJSONObject(0);
                 description = weatherObject.getString(OWM_DESCRIPTION);
                 int id = weatherObject.getInt( OWM_ICON );
 
                 String icon = "01d.png";
-                Log.d( LOG_TAG, "Weather icon: " +id );
 
-                if( id == 500 || id == 501 || id == 502) {
+                if ( id >= 200 && id <= 232 ) {     // For id between 200 - 232. ( 11d images)
+                    icon = "11d.png";
+                } else if ( id >= 300 && id <= 321 || id >= 520 && id <= 531 ) {     // For id between 300 - 321 or 520 - 531. ( 09d images)
+                    icon = "09d.png";
+                } else if( id == 511 || id >= 600 && id <= 622 ) {      // For id 511, 600 - 622. ( 13d images)
+                    icon = "13d.png";
+                } else if( id >= 701 && id <= 781 ) {      // For id between 701 - 781. ( 50d images)
+                    icon = "50d.png";
+                } else if( id >= 500 && id <= 504 ) {      // For id between 500 - 504. ( 10d images)
                     icon = "10d.png";
+                } else if ( id == 800 ) {       // For id 800 (1d or 1n images)
+                    if( mHourOfDay > 5 && mHourOfDay <= 17 ) {
+                        icon = "01d.png";
+                    } else {
+                        icon = "01n.png";
+                    }
+                } else if( id == 801 ) {        // For id 801 (2d or 2n images)
+                    if( mHourOfDay > 5 && mHourOfDay <= 17) {
+                        icon = "02d.png";
+                    } else {
+                        icon = "02n.png";
+                    }
+                } else if ( id == 802) {        // For id 802 (3d images)
+                    icon = "03d.png";
+                } else if( id == 803 ) {        // For id 803 (3d or 4d images)
+                    if( mHourOfDay > 5 && mHourOfDay <= 17 ) {
+                        icon = "04d.png";
+                    } else {
+                        icon = "03d.png";
+                    }
+                } else if ( id == 804 ) {        // For id 804 (4d images)
+                    icon = "04d.png";
                 }
-                // Temperatures are in a child object called "temp".  Try not to name variables
-                // "temp" when working with temperature.  It confuses everybody.
+
                 JSONObject temperatureObject = dayForecast.getJSONObject(OWM_TEMPERATURE);
-                double high = temperatureObject.getDouble(OWM_MAX);
-                double low = temperatureObject.getDouble(OWM_MIN);
+                double high = Math.round( temperatureObject.getDouble(OWM_MAX));
+                double low = Math.round( temperatureObject.getDouble(OWM_MIN));
 
                 int humidity = dayForecast.getInt( OWM_HUMIDITY );
                 double pressure = dayForecast.getDouble( OWM_PRESSURE );
                 double wind = dayForecast.getDouble( OWM_WIND );
-
-                highAndLow = formatHighLows(high, low);
 
                 if( i == 0 ) {
                     mTextViewDate.setText( day );
@@ -344,34 +364,15 @@ public class CityWeatherActivity extends AppCompatActivity implements IConstants
                 } else {
                     mListWeatherData.add( new WeatherDetails( day, description, icon, high, low, pressure, wind, id, humidity ));
                 }
-                Log.d( LOG_TAG, "Type: " +description+ ", Humidity: " +humidity+ ", Pressure: " +pressure+ ", Wind: " +wind
-                        + ", Max: " +high+ ", Min: " +low+ ",Day: " +day );
             }
         } catch ( Exception e ) {
             Log.d( LOG_TAG, "Exception CityWeather getWeatherDataFromJson: " +Log.getStackTraceString( e ));
         }
     }
 
-    /* The date/time conversion code is going to be moved outside the asynctask later,
-         * so for convenience we're breaking it out into its own method now.
-         */
-    private String getReadableDateString(long time){
-        // Because the API returns a unix timestamp (measured in seconds),
-        // it must be converted to milliseconds in order to be converted to valid date.
+    private String getReadableDateString(long time) {
         SimpleDateFormat shortenedDateFormat = new SimpleDateFormat("EEE, MMM dd");
         return shortenedDateFormat.format(time);
-    }
-
-    /**
-     * Prepare the weather high/lows for presentation.
-     */
-    private String formatHighLows(double high, double low) {
-        // For presentation, assume the user doesn't care about tenths of a degree.
-        long roundedHigh = Math.round(high);
-        long roundedLow = Math.round(low);
-
-        String highLowStr = roundedHigh + "/" + roundedLow;
-        return highLowStr;
     }
 
     @Override

@@ -10,10 +10,8 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -28,18 +26,16 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.sagar.sunshineweather.R;
-import com.sagar.sunshineweather.helper.RecyclerItemClickListener;
 import com.sagar.sunshineweather.adapters.WeatherDataRecyclerAdapter;
 import com.sagar.sunshineweather.data.WeatherDetails;
+import com.sagar.sunshineweather.helper.RecyclerItemClickListener;
 import com.sagar.sunshineweather.interfaces.IConstants;
 import com.squareup.picasso.Picasso;
 
@@ -58,6 +54,11 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ *
+ * The below activity shows the temperature for Current location.
+ */
+
 public class MainActivity extends AppCompatActivity implements IConstants, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
     private RecyclerView mRecyclerView;
@@ -67,16 +68,14 @@ public class MainActivity extends AppCompatActivity implements IConstants, Googl
     // Google client to interact with Google API
     private GoogleApiClient mGoogleApiClient;
     private Location mLastLocation;
-    private LocationRequest mLocationRequest;
     private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 1000;
     // boolean flag to toggle periodic location updates
-    private boolean mRequestingLocationUpdates = false;
 
     private ArrayList <WeatherDetails> mListWeatherData;
     private Calendar mCalendar;
 
-    private String unitSaved, mPlaceName;
-    private double latitude, longitude;
+    private String mUnitSaved, mPlaceName;
+    private double mLatitude, mLongitude;
     private int mHourOfDay;
 
     @Override
@@ -97,8 +96,7 @@ public class MainActivity extends AppCompatActivity implements IConstants, Googl
 
             mCalendar = Calendar.getInstance();
             SharedPreferences sharedPreferences = getSharedPreferences( SHARED_PREFERENCES_WEATHER, MODE_PRIVATE );
-            unitSaved = sharedPreferences.getString( UNIT_STORED, "Metric" );
-            Log.d( LOG_TAG, "Unit saved for conversion: " +unitSaved );
+            mUnitSaved = sharedPreferences.getString( UNIT_STORED, "Metric" );
 
             // First we need to check availability of play services
             if (checkPlayServices()) {
@@ -134,9 +132,8 @@ public class MainActivity extends AppCompatActivity implements IConstants, Googl
                     .getLastLocation(mGoogleApiClient);
 
             if (mLastLocation != null) {
-                latitude = mLastLocation.getLatitude();
-                longitude = mLastLocation.getLongitude();
-                Log.d( LOG_TAG, "Latitude: " +latitude+ " --> Longitude: " +longitude );
+                mLatitude = mLastLocation.getLatitude();
+                mLongitude = mLastLocation.getLongitude();
                 fnGetAddress();
 
                 new GetWeatherDetailsAsyncTask().execute();
@@ -279,16 +276,15 @@ public class MainActivity extends AppCompatActivity implements IConstants, Googl
             try {
                 String weatherURL;
 
-                if( unitSaved.equals( "Metric" )) {
-                    weatherURL = "http://api.openweathermap.org/data/2.5/forecast/daily?lat=" +latitude+
-                            "&lon=" +longitude+ "&units=metric&cnt=14&appid=696ab700932df75c781cbfc3493adac7";
+                if( mUnitSaved.equals( "Metric" )) {
+                    weatherURL = "http://api.openweathermap.org/data/2.5/forecast/daily?lat=" +mLatitude+
+                            "&lon=" +mLongitude+ "&units=metric&cnt=14&appid=696ab700932df75c781cbfc3493adac7";
                 } else {
-                    weatherURL = "http://api.openweathermap.org/data/2.5/forecast/daily?lat=" +latitude+
-                            "&lon=" +longitude+ "&units=imperial&cnt=14&appid=696ab700932df75c781cbfc3493adac7";
+                    weatherURL = "http://api.openweathermap.org/data/2.5/forecast/daily?lat=" +mLatitude+
+                            "&lon=" +mLongitude+ "&units=imperial&cnt=14&appid=696ab700932df75c781cbfc3493adac7";
                 }
 
                 URL url = new URL( weatherURL );
-                Log.d( LOG_TAG, "URL: " +weatherURL );
                 // Create the request to OpenWeatherMap, and open the connection
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
@@ -340,7 +336,6 @@ public class MainActivity extends AppCompatActivity implements IConstants, Googl
         protected void onPostExecute( String response ) {
             super.onPostExecute( response );
 
-            Log.d( LOG_TAG, "SunshineWeather: " +response );
             fnShowWeatherData( response );
         }
     }
@@ -383,7 +378,7 @@ public class MainActivity extends AppCompatActivity implements IConstants, Googl
     private void fnGetAddress() {
         try {
             Geocoder geocoder = new Geocoder(this, Locale.getDefault());
-            List<Address> addresses = geocoder.getFromLocation( latitude, longitude, 1);
+            List<Address> addresses = geocoder.getFromLocation( mLatitude, mLongitude, 1);
             if (addresses != null) {
                 Address returnedAddress = addresses.get(0);
                 StringBuilder strReturnedAddress = new StringBuilder("");
@@ -391,7 +386,6 @@ public class MainActivity extends AppCompatActivity implements IConstants, Googl
                 for (int i = 0; i < returnedAddress.getMaxAddressLineIndex(); i++) {
                     strReturnedAddress.append(returnedAddress.getAddressLine(i)).append("\n");
                 }
-                Log.d( LOG_TAG, "" + strReturnedAddress.toString());
             } else {
                 Log.d( LOG_TAG, "No Address returned!");
             }
@@ -425,17 +419,8 @@ public class MainActivity extends AppCompatActivity implements IConstants, Googl
             JSONObject forecastJson = new JSONObject(forecastJsonStr);
             JSONObject jsonObjectCity = forecastJson.getJSONObject( OWM_CITY );
             mPlaceName = jsonObjectCity.getString( "name" );
-            Log.d( LOG_TAG, "City name: " +mPlaceName );
             mTextViewPlaceName.setText( mPlaceName );
             JSONArray weatherArray = forecastJson.getJSONArray(OWM_LIST);
-
-            // OWM returns daily forecasts based upon the local time of the city that is being
-            // asked for, which means that we need to know the GMT offset to translate this data
-            // properly.
-
-            // Since this data is also sent in-order and the first day is always the
-            // current day, we're going to take advantage of that to get a nice
-            // normalized UTC date for all of our weather.
 
             Time dayTime = new Time();
             dayTime.setToNow();
@@ -443,14 +428,12 @@ public class MainActivity extends AppCompatActivity implements IConstants, Googl
             // we start at the day returned by local time. Otherwise this is a mess.
             int julianStartDay = Time.getJulianDay(System.currentTimeMillis(), dayTime.gmtoff);
 
-            // now we work exclusively in UTC
             dayTime = new Time();
 
             for(int i = 0; i < weatherArray.length(); i++) {
                 // For now, using the format "Day, description, hi/low"
                 String day;
                 String description;
-                String highAndLow;
 
                 // Get the JSON object representing the day
                 JSONObject dayForecast = weatherArray.getJSONObject(i);
@@ -459,17 +442,14 @@ public class MainActivity extends AppCompatActivity implements IConstants, Googl
                 // into something human-readable, since most people won't read "1400356800" as
                 // "this saturday".
                 long dateTime;
-                // Cheating to convert this to UTC time, which is what we want anyhow
                 dateTime = dayTime.setJulianDay(julianStartDay+i);
                 day = getReadableDateString(dateTime);
 
-                // description is in a child array called "weather", which is 1 element long.
                 JSONObject weatherObject = dayForecast.getJSONArray(OWM_WEATHER).getJSONObject(0);
                 description = weatherObject.getString(OWM_DESCRIPTION);
                 int id = weatherObject.getInt( OWM_ICON );
 
                 String icon = "01d.png";
-                Log.d( LOG_TAG, "Weather icon: " +id );
 
                 if ( id >= 200 && id <= 232 ) {     // For id between 200 - 232. ( 11d images)
                     icon = "11d.png";
@@ -505,27 +485,28 @@ public class MainActivity extends AppCompatActivity implements IConstants, Googl
                     icon = "04d.png";
                 }
 
-                // Temperatures are in a child object called "temp".  Try not to name variables
-                // "temp" when working with temperature.  It confuses everybody.
                 JSONObject temperatureObject = dayForecast.getJSONObject(OWM_TEMPERATURE);
-                double high = temperatureObject.getDouble(OWM_MAX);
-                double low = temperatureObject.getDouble(OWM_MIN);
+                double high = Math.round( temperatureObject.getDouble( OWM_MAX ));
+                double low = Math.round( temperatureObject.getDouble( OWM_MIN ));
 
                 int humidity = dayForecast.getInt( OWM_HUMIDITY );
                 double pressure = dayForecast.getDouble( OWM_PRESSURE );
                 double wind = dayForecast.getDouble( OWM_WIND );
 
-                highAndLow = formatHighLows(high, low);
-
                 if( i == 0 ) {
+                    String tempToShow;
                     mTextViewDate.setText( day );
 
-                    if( unitSaved.equals( "Metric" )) {
-                        mTextViewMin.setText( low +"\u00b0" );
-                        mTextViewMax.setText( high +"\u00b0" );
+                    if( mUnitSaved.equals( "Metric" )) {
+                        tempToShow = low +"\u00b0";
+                        mTextViewMin.setText( tempToShow );
+                        tempToShow = high +"\u00b0";
+                        mTextViewMax.setText( tempToShow );
                     } else {
-                        mTextViewMax.setText( "Max    " +high+ " F");
-                        mTextViewMin.setText( "Min     " +low+ " F");
+                        tempToShow = "Max    " +high+ " F";
+                        mTextViewMax.setText( tempToShow );
+                        tempToShow = "Min     " +low+ " F";
+                        mTextViewMin.setText( tempToShow );
                     }
                     mTextViewType.setText( description );
                     Picasso.with( this )
@@ -534,43 +515,18 @@ public class MainActivity extends AppCompatActivity implements IConstants, Googl
                 } else {
                     mListWeatherData.add( new WeatherDetails( day, description, icon, high, low, pressure, wind, id, humidity ));
                 }
-                Log.d( LOG_TAG, "Type: " +description+ ", Humidity: " +humidity+ ", Pressure: " +pressure+ ", Wind: " +wind
-                        + ", Max: " +high+ ", Min: " +low+ ",Day: " +day );
             }
         } catch ( Exception e ) {
             Log.d( LOG_TAG, "Exception parsing JSON: " +Log.getStackTraceString( e ));
         }
     }
 
-    /* The date/time conversion code is going to be moved outside the asynctask later,
-         * so for convenience we're breaking it out into its own method now.
-         */
     private String getReadableDateString(long time) {
         try {
-            // Because the API returns a unix timestamp (measured in seconds),
-            // it must be converted to milliseconds in order to be converted to valid date.
             SimpleDateFormat shortenedDateFormat = new SimpleDateFormat("EEE, MMM dd");
             return shortenedDateFormat.format(time);
         } catch ( Exception e ) {
             Log.d( LOG_TAG, "Exception mainActivity getReadableDate: " +Log.getStackTraceString( e ));
-        }
-        return "";
-    }
-
-    /**
-     * Prepare the weather high/lows for presentation.
-     */
-    private String formatHighLows(double high, double low) {
-        // For presentation, assume the user doesn't care about tenths of a degree.
-
-        try {
-            long roundedHigh = Math.round(high);
-            long roundedLow = Math.round(low);
-
-            String highLowStr = roundedHigh + "/" + roundedLow;
-            return highLowStr;
-        } catch ( Exception e ) {
-            Log.d( LOG_TAG, "Exception mainActivity formatHighLow: " +Log.getStackTraceString( e ));
         }
         return "";
     }

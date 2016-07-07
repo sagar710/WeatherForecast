@@ -52,11 +52,4 @@
         android:layout_alignStart="@+id/weather_data_list_item_text_view_max"
         android:textSize="16sp"
         android:text="Min"/>
-
-    <!--<android.support.v7.widget.AppCompatTextView
-        android:id="@+id/weather_data_list_item_text_view_border"
-        android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:layout_below="@+id/weather_data_list_item_image_view"
-        android:background="#000"/>-->
 </RelativeLayout>
