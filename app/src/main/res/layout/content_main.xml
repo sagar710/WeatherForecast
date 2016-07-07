@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context=".activities.MainActivity"
+    tools:showIn="@layout/activity_main">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="180dp"
+        android:padding="10dp"
+        android:background="#64B5F6">
+
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/main_activity_text_view_date"
+            android:layout_width="130dp"
+            android:layout_height="wrap_content"
+            android:text="Date"
+            android:textSize="20sp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginStart="20dp"
+            android:textColor="@color/white"/>
+
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/main_activity_text_view_place_name"
+            android:layout_width="130dp"
+            android:layout_height="wrap_content"
+            android:text="Place name"
+            android:textSize="20sp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginRight="10dp"
+            android:layout_marginEnd="10dp"
+            android:textColor="@color/white"/>
+
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/main_activity_text_view_max"
+            android:layout_width="100dp"
+            android:layout_height="60dp"
+            android:text="Max"
+            android:textSize="30sp"
+            android:textColor="@color/white"
+            android:layout_below="@+id/main_activity_text_view_date"
+            android:layout_marginTop="15dp"
+            android:layout_alignLeft="@+id/main_activity_text_view_date"
+            android:layout_alignStart="@+id/main_activity_text_view_date"/>
+
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/main_activity_text_view_min"
+            android:layout_width="100dp"
+            android:layout_height="60dp"
+            android:text="Min"
+            android:textSize="24sp"
+            android:textColor="@color/white"
+            android:layout_below="@+id/main_activity_text_view_max"
+            android:layout_marginTop="15dp"
+            android:layout_alignLeft="@+id/main_activity_text_view_max"
+            android:layout_alignStart="@+id/main_activity_text_view_max"/>
+
+        <android.support.v7.widget.AppCompatImageView
+            android:id="@+id/main_activity_image_view"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_marginTop="30dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginRight="50dp"
+            android:layout_marginEnd="50dp"/>
+
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/main_activity_text_view_type"
+            android:layout_width="100dp"
+            android:layout_height="60dp"
+            android:text="Type"
+            android:textSize="24sp"
+            android:textColor="@color/white"
+            android:layout_below="@+id/main_activity_image_view"
+            android:layout_marginTop="15dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:paddingStart="10dp"
+            android:layout_alignLeft="@+id/main_activity_image_view"
+            android:layout_alignStart="@+id/main_activity_image_view"/>
+
+    </RelativeLayout>
+    <!--<android.support.v7.widget.AppCompatTextView
+        android:id="@+id/main_activity_text_view_current_location"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="16sp" />-->
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/main_activity_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+</LinearLayout>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="5dp"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context=".activities.AddCitiesActivity"
+    tools:showIn="@layout/activity_add_cities">
+
+    <android.support.v7.widget.AppCompatEditText
+        android:id="@+id/add_cities_activity_edit_text_add_city"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:lines="1"
+        android:hint="@string/add_city_activity_enter_city"/>
+
+    <android.support.v7.widget.AppCompatButton
+        android:id="@+id/add_cities_activity_btn_add_city"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/btn_add_city"
+        android:padding="10dp"
+        android:background="#64B5F6"
+        android:textColor="@color/white"
+        android:layout_gravity="center_horizontal"/>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/add_cities_activity_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"/>
+</LinearLayout>
